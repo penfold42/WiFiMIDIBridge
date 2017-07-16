@@ -52,11 +52,11 @@ void procX(uint8_t *data, AsyncWebSocketClient *client) {
                 seqErrors =+ seqError[i];
             client->text("X2" + (String)config.universe + ":" +
                     (String)uniLast + ":" +
-                    (String)e131.stats.num_packets + ":" +
+                    (String)42 + ":" +
                     (String)seqErrors + ":" +
-                    (String)e131.stats.packet_errors + ":" +
-                    e131.stats.last_clientIP.toString() + ":" + 
-                    (String)e131.stats.last_clientPort);
+                    (String)69 + ":" +
+                    "10.666.6.6" + ":" + 
+                    (String)6699);
             break;
         }
         case 'h':
@@ -150,8 +150,8 @@ void procS(uint8_t *data, AsyncWebSocketClient *client) {
     DynamicJsonBuffer jsonBuffer;
     JsonObject &json = jsonBuffer.parseObject(reinterpret_cast<char*>(data + 2));
     if (!json.success()) {
-        LOG_PORT.println(F("*** procS(): Parse Error ***"));
-        LOG_PORT.println(reinterpret_cast<char*>(data));
+        DBG_PORT.println(F("*** procS(): Parse Error ***"));
+        DBG_PORT.println(reinterpret_cast<char*>(data));
         return;
     }
 
@@ -239,14 +239,14 @@ void handle_fw_upload(AsyncWebServerRequest *request, String filename,
         size_t index, uint8_t *data, size_t len, bool final) {
     if (!index) {
         WiFiUDP::stopAll();
-        LOG_PORT.print(F("* Upload Started: "));
-        LOG_PORT.println(filename.c_str());
+        DBG_PORT.print(F("* Upload Started: "));
+        DBG_PORT.println(filename.c_str());
         efupdate.begin();
     }
 
     if (!efupdate.process(data, len)) {
-        LOG_PORT.print(F("*** UPDATE ERROR: "));
-        LOG_PORT.println(String(efupdate.getError()));
+        DBG_PORT.print(F("*** UPDATE ERROR: "));
+        DBG_PORT.println(String(efupdate.getError()));
     }
 
     if (efupdate.hasError())
@@ -254,7 +254,7 @@ void handle_fw_upload(AsyncWebServerRequest *request, String filename,
                 String(efupdate.getError()));
 
     if (final) {
-        LOG_PORT.println(F("* Upload Finished."));
+        DBG_PORT.println(F("* Upload Finished."));
         efupdate.end();
         SPIFFS.begin();
         saveConfig();
@@ -286,20 +286,20 @@ void wsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         break;
                 }
             } else {
-                LOG_PORT.println(F("-- binary message --"));
+                DBG_PORT.println(F("-- binary message --"));
             }
             break;
         }
         case WS_EVT_CONNECT:
-            LOG_PORT.print(F("* WS Connect - "));
-            LOG_PORT.println(client->id());
+            DBG_PORT.print(F("* WS Connect - "));
+            DBG_PORT.println(client->id());
             break;
         case WS_EVT_DISCONNECT:
-            LOG_PORT.print(F("* WS Disconnect - "));
-            LOG_PORT.println(client->id());
+            DBG_PORT.print(F("* WS Disconnect - "));
+            DBG_PORT.println(client->id());
             break;
         case WS_EVT_ERROR:
-            LOG_PORT.println(F("** WS ERROR **"));
+            DBG_PORT.println(F("** WS ERROR **"));
             break;
     }
 }

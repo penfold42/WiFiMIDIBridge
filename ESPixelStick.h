@@ -20,11 +20,6 @@
 #ifndef ESPIXELSTICK_H_
 #define ESPIXELSTICK_H_
 
-#if defined(ESPS_MODE_PIXEL)
-#include "PixelDriver.h"
-#elif defined(ESPS_MODE_SERIAL)
-#include "SerialDriver.h"
-#endif
 
 /* Name and version */
 const char VERSION[] = "3.0-dev2 (20170629)";
@@ -35,18 +30,10 @@ const char VERSION[] = "3.0-dev2 (20170629)";
 #define EEPROM_BASE     0       /* EEPROM configuration base address */
 #define UNIVERSE_LIMIT  512     /* Universe boundary - 512 Channels */
 #define PIXEL_LIMIT     1360    /* Total pixel limit - 40.85ms for 8 universes */
-#define RENARD_LIMIT    2048    /* Channel limit for serial outputs */
-#define E131_TIMEOUT    1000    /* Force refresh every second an E1.31 packet is not seen */
 #define CONNECT_TIMEOUT 15000   /* 15 seconds */
 #define REBOOT_DELAY    100     /* Delay for rebooting once reboot flag is set */
-#define LOG_PORT        Serial  /* Serial port for console logging */
+#define DBG_PORT        Serial  /* Serial port for console logging */
 
-/* E1.33 / RDMnet stuff - to be moved to library */
-#define RDMNET_DNSSD_SRV_TYPE   "draft-e133.tcp"
-#define RDMNET_DEFAULT_SCOPE    "default"
-#define RDMNET_DEFAULT_DOMAIN   "local"
-#define RDMNET_DNSSD_TXTVERS    1
-#define RDMNET_DNSSD_E133VERS   1
 
 /* Configuration file params */
 const char CONFIG_FILE[] = "/config.json";
@@ -73,6 +60,22 @@ typedef struct {
     uint16_t step;               //step in testing routine
     uint32_t last;              //last update
 } testing_t;
+
+/* Pixel Types */
+enum class PixelType : uint8_t {
+    WS2811,
+    GECE
+};
+
+/* Color Order */
+enum class PixelColor : uint8_t {
+    RGB,
+    GRB,
+    BRG,
+    RBG,
+    GBR,
+    BGR
+};
 
 /* Configuration structure */
 typedef struct {
@@ -105,21 +108,15 @@ typedef struct {
     uint16_t    channel_count;  /* Number of channels */
     bool        multicast;      /* Enable multicast listener */
 
-#if defined(ESPS_MODE_PIXEL)
     /* Pixels */
     PixelType   pixel_type;     /* Pixel type */
     PixelColor  pixel_color;    /* Pixel color order */
     bool        gamma;          /* Use gamma map? */
 
-#elif defined(ESPS_MODE_SERIAL)
-    /* Serial */
-    SerialType  serial_type;    /* Serial type */
-    BaudRate    baudrate;       /* Baudrate */
-#endif
 } config_t;
 
 /* Globals */
-E131Async       e131(10);       /* E131Async with X buffers */
+//E131Async       e131(10);       /* E131Async with X buffers */
 testing_t       testing;
 config_t        config;
 uint32_t        *seqError;      /* Sequence error tracking for each universe */
@@ -128,16 +125,6 @@ bool            reboot = false; /* Reboot flag */
 AsyncWebServer  web(HTTP_PORT); /* Web Server */
 AsyncWebSocket  ws("/ws");      /* Web Socket Plugin */
 
-/* Output Drivers */
-#if defined(ESPS_MODE_PIXEL)
-#include "PixelDriver.h"
-PixelDriver     pixels;         /* Pixel object */
-#elif defined(ESPS_MODE_SERIAL)
-#include "SerialDriver.h"
-SerialDriver    serial;         /* Serial object */
-#else
-#error "No valid output mode defined."
-#endif
 
 /* Forward Declarations */
 void serializeConfig(String &jsonString, bool pretty = false, bool creds = false);

@@ -315,7 +315,7 @@ function wsConnect() {
             $('#wserror').modal({backdrop: 'static', keyboard: false});
         };
     } else {
-        alert('WebSockets is NOT supported by your Browser! You will need to upgrade your browser or downgrade to v2.0 of the ESPixelStick firmware.');
+        alert('WebSockets is NOT supported by your Browser! You will need to upgrade your browser.');
     }
 }
 

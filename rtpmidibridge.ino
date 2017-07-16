@@ -11,15 +11,14 @@
 #include <ArduinoJson.h>
 #include <Hash.h>
 #include <SPI.h>
-#include <E131Async.h>
+//#include <E131Async.h>
 #include "ESPixelStick.h"
 #include "EFUpdate.h"
 #include "wshandler.h"
 
 extern "C" {
-#include <user_interface.h>
+  #include <user_interface.h>
 }
-
 
 #include <AppleMidi.h>
 #include <MIDI.h>
@@ -31,7 +30,8 @@ extern "C" {
 #include <RemoteDebug.h>
 RemoteDebug Debug;
 
-MIDI_CREATE_DEFAULT_INSTANCE();
+//MIDI_CREATE_DEFAULT_INSTANCE();
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 #include "c:/creds.h"
 char ssid[] = MY_SSID; //  your network SSID (name)
@@ -46,7 +46,6 @@ void updateConfig();
 WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
 Ticker wifiTicker;
-
 
 unsigned long t0 = millis();
 bool isConnected = false;
@@ -76,7 +75,7 @@ void setup()
 
     setup_vs1053();
 
-    setup_wifi_config();
+    ESP_setup();
 //    old_wifi();
 
     setup_SerialMIDI();
@@ -107,6 +106,13 @@ void loop()
     // Remote debug over telnet
     Debug.handle();
     #endif
+
+    // Reboot handler
+    if (reboot) {
+        delay(REBOOT_DELAY);
+        ESP.restart();
+    }
+
 }
 
 uint8_t HOTRS_notes[] = {50,65,69,74,69,65,53,69,72,77,72,69,55,71,74,79,74,71,58,70,74,77,74,70};
@@ -160,11 +166,6 @@ void old_wifi()
 */
 
 
-
-/* Fallback configuration if config.json is empty or fails */
-const char ssid[] = "ENTER_SSID_HERE";
-const char passphrase[] = "ENTER_PASSPHRASE_HERE";
-
 /*****************************************/
 /*         END - Configuration           */
 /*****************************************/
@@ -174,9 +175,6 @@ const char passphrase[] = "ENTER_PASSPHRASE_HERE";
 uint8_t             *seqTracker;        /* Current sequence numbers for each Universe */
 uint32_t            lastUpdate;         /* Update timeout tracker */
 
-
-
-
 void ESP_setup() {
     // Configure SDK params
     wifi_set_sleep_type(NONE_SLEEP_T);
@@ -184,11 +182,11 @@ void ESP_setup() {
     // Enable SPIFFS
     SPIFFS.begin();
 
-    LOG_PORT.println("");
-    LOG_PORT.print(F("ESPixelStick v"));
+    DBG_PORT.println("");
+    DBG_PORT.print(F("ESPixelStick v"));
     for (uint8_t i = 0; i < strlen_P(VERSION); i++)
-        LOG_PORT.print((char)(pgm_read_byte(VERSION + i)));
-    LOG_PORT.println("");
+        DBG_PORT.print((char)(pgm_read_byte(VERSION + i)));
+    DBG_PORT.println("");
 
     // Load configuration from SPIFFS and set Hostname
     loadConfig();
@@ -202,7 +200,7 @@ void ESP_setup() {
     // Fallback to default SSID and passphrase if we fail to connect
     initWifi();
     if (WiFi.status() != WL_CONNECTED) {
-        LOG_PORT.println(F("*** Timeout - Reverting to default SSID ***"));
+        DBG_PORT.println(F("*** Timeout - Reverting to default SSID ***"));
         config.ssid = ssid;
         config.passphrase = passphrase;
         initWifi();
@@ -211,12 +209,12 @@ void ESP_setup() {
     // If we fail again, go SoftAP or reboot
     if (WiFi.status() != WL_CONNECTED) {
         if (config.ap_fallback) {
-            LOG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, GOING SOFTAP ****"));
+            DBG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, GOING SOFTAP ****"));
             WiFi.mode(WIFI_AP);
             String ssid = "ESPixelStick " + String(config.hostname);
             WiFi.softAP(ssid.c_str());
         } else {
-            LOG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, REBOOTING ****"));
+            DBG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, REBOOTING ****"));
             ESP.restart();
         }
     }
@@ -246,11 +244,11 @@ void initWifi() {
     connectWifi();
     uint32_t timeout = millis();
     while (WiFi.status() != WL_CONNECTED) {
-        LOG_PORT.print(".");
+        DBG_PORT.print(".");
         delay(500);
         if (millis() - timeout > CONNECT_TIMEOUT) {
-            LOG_PORT.println("");
-            LOG_PORT.println(F("*** Failed to connect ***"));
+            DBG_PORT.println("");
+            DBG_PORT.println(F("*** Failed to connect ***"));
             break;
         }
     }
@@ -259,15 +257,15 @@ void initWifi() {
 void connectWifi() {
     delay(secureRandom(100,500));
 
-    LOG_PORT.println("");
-    LOG_PORT.print(F("Connecting to "));
-    LOG_PORT.print(config.ssid);
-    LOG_PORT.print(F(" as "));
-    LOG_PORT.println(config.hostname);
+    DBG_PORT.println("");
+    DBG_PORT.print(F("Connecting to "));
+    DBG_PORT.print(config.ssid);
+    DBG_PORT.print(F(" as "));
+    DBG_PORT.println(config.hostname);
 
     WiFi.begin(config.ssid.c_str(), config.passphrase.c_str());
     if (config.dhcp) {
-        LOG_PORT.print(F("Connecting with DHCP"));
+        DBG_PORT.print(F("Connecting with DHCP"));
     } else {
         // We don't use DNS, so just set it to our gateway
         WiFi.config(IPAddress(config.ip[0], config.ip[1], config.ip[2], config.ip[3]),
@@ -275,51 +273,33 @@ void connectWifi() {
                     IPAddress(config.netmask[0], config.netmask[1], config.netmask[2], config.netmask[3]),
                     IPAddress(config.gateway[0], config.gateway[1], config.gateway[2], config.gateway[3])
         );
-        LOG_PORT.print(F("Connecting with Static IP"));
+        DBG_PORT.print(F("Connecting with Static IP"));
     }
 }
 
 void onWifiConnect(const WiFiEventStationModeGotIP &event) {
-    LOG_PORT.println("");
-    LOG_PORT.print(F("Connected with IP: "));
-    LOG_PORT.println(WiFi.localIP());
-
-    // Setup MQTT connection if enabled
-    if (config.mqtt)
-        connectToMqtt();
+    DBG_PORT.println("");
+    DBG_PORT.print(F("Connected with IP: "));
+    DBG_PORT.println(WiFi.localIP());
 
     // Setup mDNS / DNS-SD
     //TODO: Reboot or restart mdns when config.id is changed?
-     char chipId[7] = { 0 };
+    char chipId[7] = { 0 };
     snprintf(chipId, sizeof(chipId), "%06x", ESP.getChipId());
     MDNS.setInstanceName(config.id + " (" + String(chipId) + ")");
     if (MDNS.begin(config.hostname.c_str())) {
         MDNS.addService("http", "tcp", HTTP_PORT);
-        MDNS.addService("e131", "udp", E131_DEFAULT_PORT);
-        MDNS.addServiceTxt("e131", "udp", "TxtVers", String(RDMNET_DNSSD_TXTVERS));
-        MDNS.addServiceTxt("e131", "udp", "ConfScope", RDMNET_DEFAULT_SCOPE);
-        MDNS.addServiceTxt("e131", "udp", "E133Vers", String(RDMNET_DNSSD_E133VERS));
-        MDNS.addServiceTxt("e131", "udp", "CID", String(chipId));
-        MDNS.addServiceTxt("e131", "udp", "Model", "ESPixelStick");
-        MDNS.addServiceTxt("e131", "udp", "Manuf", "Forkineye");
+        MDNS.addService("apple-midi", "udp", DEFAULT_MIDI_PORT);
     } else {
-        LOG_PORT.println(F("*** Error setting up mDNS responder ***"));
+        DBG_PORT.println(F("*** Error setting up mDNS responder ***"));
     }
 }
 
 void onWiFiDisconnect(const WiFiEventStationModeDisconnected &event) {
-    LOG_PORT.println(F("*** WiFi Disconnected ***"));
+    DBG_PORT.println(F("*** WiFi Disconnected ***"));
 
-    // Pause MQTT reconnect while WiFi is reconnecting
-    mqttTicker.detach();
     wifiTicker.once(2, connectWifi);
 }
-
-/////////////////////////////////////////////////////////
-// 
-//  MQTT Section
-//
-/////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////
@@ -363,8 +343,8 @@ void initWeb() {
 
     web.begin();
 
-    LOG_PORT.print(F("- Web Server started on port "));
-    LOG_PORT.println(HTTP_PORT);
+    DBG_PORT.print(F("- Web Server started on port "));
+    DBG_PORT.println(HTTP_PORT);
 }
 
 /////////////////////////////////////////////////////////
@@ -439,22 +419,13 @@ void updateConfig() {
     if (seqError = static_cast<uint32_t *>(malloc(uniTotal * 4)))
         memset(seqError, 0x00, uniTotal * 4);
 
-    /* Zero out packet stats */
-    e131.stats.num_packets = 0;
 
-    /* Initialize for our pixel type */
-#if defined(ESPS_MODE_PIXEL)
-    pixels.begin(config.pixel_type, config.pixel_color, config.channel_count / 3);
-    pixels.setGamma(config.gamma);
-#elif defined(ESPS_MODE_SERIAL)
-    serial.begin(&SEROUT_PORT, config.serial_type, config.channel_count, config.baudrate);
-#endif
-    LOG_PORT.print(F("- Listening for "));
-    LOG_PORT.print(config.channel_count);
-    LOG_PORT.print(F(" channels, from Universe "));
-    LOG_PORT.print(config.universe);
-    LOG_PORT.print(F(" to "));
-    LOG_PORT.println(uniLast);
+    DBG_PORT.print(F("- Listening for "));
+    DBG_PORT.print(config.channel_count);
+    DBG_PORT.print(F(" channels, from Universe "));
+    DBG_PORT.print(config.universe);
+    DBG_PORT.print(F(" to "));
+    DBG_PORT.println(uniLast);
 }
 
 // De-Serialize Network config
@@ -511,7 +482,7 @@ void loadConfig() {
     /* Load CONFIG_FILE json. Create and init with defaults if not found */
     File file = SPIFFS.open(CONFIG_FILE, "r");
     if (!file) {
-        LOG_PORT.println(F("- No configuration file found."));
+        DBG_PORT.println(F("- No configuration file found."));
         config.ssid = ssid;
         config.passphrase = passphrase;
         saveConfig();
@@ -519,7 +490,7 @@ void loadConfig() {
         /* Parse CONFIG_FILE json */
         size_t size = file.size();
         if (size > CONFIG_MAX_SIZE) {
-            LOG_PORT.println(F("*** Configuration File too large ***"));
+            DBG_PORT.println(F("*** Configuration File too large ***"));
             return;
         }
 
@@ -529,14 +500,14 @@ void loadConfig() {
         DynamicJsonBuffer jsonBuffer;
         JsonObject &json = jsonBuffer.parseObject(buf.get());
         if (!json.success()) {
-            LOG_PORT.println(F("*** Configuration File Format Error ***"));
+            DBG_PORT.println(F("*** Configuration File Format Error ***"));
             return;
         }
 
         dsNetworkConfig(json);
         dsDeviceConfig(json);
 
-        LOG_PORT.println(F("- Configuration loaded."));
+        DBG_PORT.println(F("- Configuration loaded."));
     }
 
     /* Validate it */
@@ -603,49 +574,11 @@ void saveConfig() {
     /* Save Config */
     File file = SPIFFS.open(CONFIG_FILE, "w");
     if (!file) {
-        LOG_PORT.println(F("*** Error creating configuration file ***"));
+        DBG_PORT.println(F("*** Error creating configuration file ***"));
         return;
     } else {
         file.println(jsonString);
-        LOG_PORT.println(F("* Configuration saved."));
+        DBG_PORT.println(F("* Configuration saved."));
     }
 }
-
-
-/////////////////////////////////////////////////////////
-// 
-//  Set routines for Testing and MQTT
-//
-/////////////////////////////////////////////////////////
-
-void setStatic(uint8_t r, uint8_t g, uint8_t b) {
-    uint16_t i = 0;
-    while (i <= config.channel_count - 3) {
-#if defined(ESPS_MODE_PIXEL)
-        pixels.setValue(i++, r);
-        pixels.setValue(i++, g);
-        pixels.setValue(i++, b);
-#elif defined(ESPS_MODE_SERIAL)
-        serial.setValue(i++, r);
-        serial.setValue(i++, g);
-        serial.setValue(i++, b);
-#endif
-    }
-}
-
-
-/////////////////////////////////////////////////////////
-// 
-//  Main Loop
-//
-/////////////////////////////////////////////////////////
-void ESP_loop() {
-
-    // Reboot handler
-    if (reboot) {
-        delay(REBOOT_DELAY);
-        ESP.restart();
-    }
-}
-
 
