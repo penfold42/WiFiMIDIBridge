@@ -1,5 +1,18 @@
 #include "rtpmidibridge.h"
 
+void setup_vs1053() {
+#ifdef USE_SPI_VS1053
+    SPI.begin();
+    pinMode(VS1053_XDCS,OUTPUT);
+    digitalWrite(VS1053_XDCS,HIGH);
+  
+    pinMode(VS1053_RESET,OUTPUT);
+    digitalWrite(VS1053_RESET,LOW);
+    delay(10);
+    digitalWrite(VS1053_RESET,HIGH);
+#endif
+}
+
 void SPI3(int cmd, int one, int two) {
 #ifdef USE_SPI_VS1053
   digitalWrite(VS1053_XDCS,LOW);

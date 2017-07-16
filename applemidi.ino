@@ -1,6 +1,5 @@
 void setup_AppleMIDI() {
 
-
   AppleMIDI.OnConnected(OnAppleMidiConnected);
   AppleMIDI.OnDisconnected(OnAppleMidiDisconnected);
 
