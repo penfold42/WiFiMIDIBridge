@@ -2,5 +2,4 @@ node_modules
 *.gz
 *.*~
 *.swp
-
 data/config.json
