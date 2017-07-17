@@ -245,11 +245,20 @@ function feed() {
     }
 }
 
+function param(name) {
+    return (location.search.split(name + '=')[1] || '').split('&')[0];
+}
+
 // WebSockets
 function wsConnect() {
     if ('WebSocket' in window) {
+	if (target = param('target')) {
+//		alert ('got target ' + target);
+	} else {
+		target = document.location.host;
+	}
         // Open a new web socket and set the binary type
-        ws = new WebSocket('ws://' + document.location.host + '/ws');
+	ws = new WebSocket('ws://' + target + '/ws');
         ws.binaryType = 'arraybuffer';
 
         ws.onopen = function() {
@@ -369,7 +378,7 @@ function getConfig(data) {
     var config = JSON.parse(data);
 
     // Device and Network config
-    $('#title').text('ESPS - ' + config.device.id);
+    $('#title').text('WifiMIDI - ' + config.device.id);
     $('#name').text(config.device.id);
     $('#devid').val(config.device.id);
     $('#ssid').val(config.network.ssid);
