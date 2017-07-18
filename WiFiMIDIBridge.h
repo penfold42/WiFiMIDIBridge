@@ -1,6 +1,6 @@
 #define DEFAULT_MIDI_PORT 5004
 
-#define DBG_PORT Serial
+#define DBG_PORT Debug
 
 #define USE_SPI_VS1053
 

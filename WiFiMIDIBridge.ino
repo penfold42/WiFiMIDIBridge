@@ -25,13 +25,13 @@ extern "C" {
 #include <SPI.h>
 #include "WiFiMIDIBridge.h"
 
-#define DBG_PORT Serial
+
 
 #include <RemoteDebug.h>
 RemoteDebug Debug;
 
 //MIDI_CREATE_DEFAULT_INSTANCE();
-MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
 #include "c:/creds.h"
 char ssid[] = MY_SSID; //  your network SSID (name)
