@@ -1,5 +1,7 @@
 #define DEFAULT_MIDI_PORT 5004
 
+#define DBG_PORT Serial
+
 #define USE_SPI_VS1053
 
 #define VS1053_RESET 15

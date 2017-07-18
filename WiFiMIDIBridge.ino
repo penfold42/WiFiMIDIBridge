@@ -23,7 +23,7 @@ extern "C" {
 #include <AppleMidi.h>
 #include <MIDI.h>
 #include <SPI.h>
-#include "rtpmidibridge.h"
+#include "WiFiMIDIBridge.h"
 
 #define DBG_PORT Serial
 

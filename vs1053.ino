@@ -1,4 +1,4 @@
-#include "rtpmidibridge.h"
+#include "WiFiMIDIBridge.h"
 
 void setup_vs1053() {
 #ifdef USE_SPI_VS1053

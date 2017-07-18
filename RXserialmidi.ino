@@ -1,25 +1,3 @@
-void setup_SerialMIDI() {
-    MIDI.setHandleNoteOn(dinHandleNoteOn);  // Put only the name of the function
-    MIDI.setHandleNoteOff(dinHandleNoteOff);
-    MIDI.setHandleAfterTouchPoly(dinHandleAfterTouchPoly);
-    MIDI.setHandleControlChange(dinHandleControlChange);
-    MIDI.setHandleProgramChange(dinHandleProgramChange);
-    MIDI.setHandleAfterTouchChannel(dinHandleAfterTouchChannel);
-    MIDI.setHandlePitchBend(dinHandlePitchBend);
-    MIDI.setHandleSystemExclusive(dinHandleSystemExclusive);
-    MIDI.setHandleTimeCodeQuarterFrame(dinHandleTimeCodeQuarterFrame);
-    MIDI.setHandleSongPosition(dinHandleSongPosition);
-    MIDI.setHandleSongSelect(dinHandleSongSelect);
-    MIDI.setHandleTuneRequest(dinHandleTuneRequest);
-    MIDI.setHandleClock(dinHandleClock);
-    MIDI.setHandleStart(dinHandleStart);
-    MIDI.setHandleContinue(dinHandleContinue);
-    MIDI.setHandleStop(dinHandleStop);
-    MIDI.setHandleActiveSensing(dinHandleActiveSensing);
-    MIDI.setHandleSystemReset(dinHandleSystemReset);
-
-}
-
 
 void dinHandleNoteOn(byte channel, byte pitch, byte velocity) {
   if (isConnected) AppleMIDI.noteOn(pitch, velocity, channel);    
@@ -76,6 +54,28 @@ void dinHandleActiveSensing (void) {
 }
 void dinHandleSystemReset (void) {
   if (isConnected) AppleMIDI.systemReset();
+}
+
+void setup_SerialMIDI() {
+    MIDI.setHandleNoteOn(dinHandleNoteOn);  // Put only the name of the function
+    MIDI.setHandleNoteOff(dinHandleNoteOff);
+    MIDI.setHandleAfterTouchPoly(dinHandleAfterTouchPoly);
+    MIDI.setHandleControlChange(dinHandleControlChange);
+    MIDI.setHandleProgramChange(dinHandleProgramChange);
+    MIDI.setHandleAfterTouchChannel(dinHandleAfterTouchChannel);
+    MIDI.setHandlePitchBend(dinHandlePitchBend);
+    MIDI.setHandleSystemExclusive(dinHandleSystemExclusive);
+    MIDI.setHandleTimeCodeQuarterFrame(dinHandleTimeCodeQuarterFrame);
+    MIDI.setHandleSongPosition(dinHandleSongPosition);
+    MIDI.setHandleSongSelect(dinHandleSongSelect);
+    MIDI.setHandleTuneRequest(dinHandleTuneRequest);
+    MIDI.setHandleClock(dinHandleClock);
+    MIDI.setHandleStart(dinHandleStart);
+    MIDI.setHandleContinue(dinHandleContinue);
+    MIDI.setHandleStop(dinHandleStop);
+    MIDI.setHandleActiveSensing(dinHandleActiveSensing);
+    MIDI.setHandleSystemReset(dinHandleSystemReset);
+
 }
 
 

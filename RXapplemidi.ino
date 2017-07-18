@@ -1,28 +1,7 @@
-void setup_AppleMIDI() {
+#include <WiFiUdp.h>
+#include <AppleMidi.h>
+#include "WiFiMIDIBridge.h"
 
-  AppleMIDI.OnConnected(OnAppleMidiConnected);
-  AppleMIDI.OnDisconnected(OnAppleMidiDisconnected);
-
-  AppleMIDI.OnReceiveNoteOn(OnAppleMidiNoteOn);
-  AppleMIDI.OnReceiveNoteOff(OnAppleMidiNoteOff);
-  AppleMIDI.OnReceiveAfterTouchPoly(OnAppleMidiAfterTouchPoly);
-  AppleMIDI.OnReceiveControlChange(OnAppleMidiControlChange);
-  AppleMIDI.OnReceiveProgramChange(OnAppleMidiProgramChange);
-  AppleMIDI.OnReceiveAfterTouchChannel(OnAppleMidiAfterTouchChannel);
-  AppleMIDI.OnReceivePitchBend(OnAppleMidiPitchBend);
-  AppleMIDI.OnReceiveSystemExclusive(OnAppleMidiSystemExclusive);
-  AppleMIDI.OnReceiveTimeCodeQuarterFrame(OnAppleMidiTimeCodeQuarterFrame);
-  AppleMIDI.OnReceiveSongPosition(OnAppleMidiSongPosition);
-  AppleMIDI.OnReceiveSongSelect(OnAppleMidiSongSelect);
-  AppleMIDI.OnReceiveTuneRequest(OnAppleMidiTuneRequest);
-  AppleMIDI.OnReceiveClock(OnAppleMidiClock);
-  AppleMIDI.OnReceiveStart(OnAppleMidiStart);
-  AppleMIDI.OnReceiveContinue(OnAppleMidiContinue);
-  AppleMIDI.OnReceiveStop(OnAppleMidiStop);
-  AppleMIDI.OnReceiveActiveSensing(OnAppleMidiActiveSensing);
-  AppleMIDI.OnReceiveSystemReset(OnAppleMidiSystemReset);
-
-}
 
 // ====================================================================================
 // Event handlers for incoming MIDI messages
@@ -90,4 +69,31 @@ void OnAppleMidiContinue(void) { MIDI.sendRealTime(midi::Continue); }
 void OnAppleMidiStop(void) { MIDI.sendRealTime(midi::Stop); }
 void OnAppleMidiActiveSensing(void) {}
 void OnAppleMidiSystemReset(void) {}
+
+
+void setup_AppleMIDI() {
+
+  AppleMIDI.OnConnected(OnAppleMidiConnected);
+  AppleMIDI.OnDisconnected(OnAppleMidiDisconnected);
+
+  AppleMIDI.OnReceiveNoteOn(OnAppleMidiNoteOn);
+  AppleMIDI.OnReceiveNoteOff(OnAppleMidiNoteOff);
+  AppleMIDI.OnReceiveAfterTouchPoly(OnAppleMidiAfterTouchPoly);
+  AppleMIDI.OnReceiveControlChange(OnAppleMidiControlChange);
+  AppleMIDI.OnReceiveProgramChange(OnAppleMidiProgramChange);
+  AppleMIDI.OnReceiveAfterTouchChannel(OnAppleMidiAfterTouchChannel);
+  AppleMIDI.OnReceivePitchBend(OnAppleMidiPitchBend);
+  AppleMIDI.OnReceiveSystemExclusive(OnAppleMidiSystemExclusive);
+  AppleMIDI.OnReceiveTimeCodeQuarterFrame(OnAppleMidiTimeCodeQuarterFrame);
+  AppleMIDI.OnReceiveSongPosition(OnAppleMidiSongPosition);
+  AppleMIDI.OnReceiveSongSelect(OnAppleMidiSongSelect);
+  AppleMIDI.OnReceiveTuneRequest(OnAppleMidiTuneRequest);
+  AppleMIDI.OnReceiveClock(OnAppleMidiClock);
+  AppleMIDI.OnReceiveStart(OnAppleMidiStart);
+  AppleMIDI.OnReceiveContinue(OnAppleMidiContinue);
+  AppleMIDI.OnReceiveStop(OnAppleMidiStop);
+  AppleMIDI.OnReceiveActiveSensing(OnAppleMidiActiveSensing);
+  AppleMIDI.OnReceiveSystemReset(OnAppleMidiSystemReset);
+
+}
 
