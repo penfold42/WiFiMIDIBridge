@@ -1,59 +1,74 @@
+#include "ESPixelStick.h"
 
-void dinHandleNoteOn(byte channel, byte pitch, byte velocity) {
-  if (isConnected) AppleMIDI.noteOn(pitch, velocity, channel);    
+void dinHandleNoteOn(byte channel, byte note, byte velocity) {
+    RouteMidiNoteOn(FROM_DIN, channel, note, velocity);
 }
-void dinHandleNoteOff(byte channel, byte pitch, byte velocity) {
-  if (isConnected) AppleMIDI.noteOff(pitch, velocity, channel);
+void dinHandleNoteOff(byte channel, byte note, byte velocity) {
+    RouteMidiNoteOff(FROM_DIN, channel, note, velocity);
 }
 
 void dinHandleAfterTouchPoly (byte channel, byte note, byte pressure) {
-  if (isConnected) AppleMIDI.polyPressure(note, pressure, channel);
+    RouteMidiAfterTouchPoly(FROM_DIN,  channel,  note,  pressure);
 }
 
 void dinHandleControlChange (byte channel, byte number, byte value) {
-  if (isConnected) AppleMIDI.controlChange(number, value, channel);
+    RouteMidiControlChange(FROM_DIN,  channel,  number,  value);
 }
+
 void dinHandleProgramChange (byte channel, byte number) {
-  if (isConnected) AppleMIDI.programChange( number, channel);
+    RouteMidiProgramChange(FROM_DIN,  channel,  number);
 }
+
 void dinHandleAfterTouchChannel (byte channel, byte pressure) {
-  if (isConnected) AppleMIDI.afterTouch(pressure, channel);
+    RouteMidiAfterTouchChannel(FROM_DIN,  channel,  pressure);
 }
+
 void dinHandlePitchBend (byte channel, int bend) {
-  if (isConnected) AppleMIDI.pitchBend(bend, channel);
+    RouteMidiPitchBend(FROM_DIN,  channel,  bend);
 }
+
 void dinHandleSystemExclusive (byte* array, unsigned size) {
-  if (isConnected) AppleMIDI.sysEx(size, array, true); // check this
+    RouteMidiSystemExclusive(FROM_DIN, array,  size);
 }
+
 void dinHandleTimeCodeQuarterFrame (byte data) {
-  if (isConnected) AppleMIDI.timeCodeQuarterFrame(data);
+    RouteMidiTimeCodeQuarterFrame(FROM_DIN,  data);
 }
+
 void dinHandleSongPosition (unsigned beats) {
-  if (isConnected) AppleMIDI.songPosition(beats);
+    RouteMidiSongPosition(FROM_DIN, beats);
 }
+
 void dinHandleSongSelect (byte songnumber) {
-  if (isConnected) AppleMIDI.songSelect(songnumber);
+    RouteMidiSongSelect(FROM_DIN,  songnumber);
 }
+
 void dinHandleTuneRequest (void) {
-  if (isConnected) AppleMIDI.tuneRequest();
+    RouteMidiTuneRequest(FROM_DIN);
 }
+
 void dinHandleClock (void) {
-  if (isConnected) AppleMIDI.clock();
+    RouteMidiClock(FROM_DIN);
 }
+
 void dinHandleStart (void) {
-  if (isConnected) AppleMIDI.start();
+    RouteMidiStart(FROM_DIN);
 }
+
 void dinHandleContinue (void) {
-  if (isConnected) AppleMIDI._continue();
+    RouteMidiContinue(FROM_DIN);
 }
+
 void dinHandleStop (void) {
-  if (isConnected) AppleMIDI.stop();
+    RouteMidiStop(FROM_DIN);
 }
+
 void dinHandleActiveSensing (void) {
-  if (isConnected) AppleMIDI.activeSensing();
+    RouteMidiActiveSensing(FROM_DIN);
 }
+
 void dinHandleSystemReset (void) {
-  if (isConnected) AppleMIDI.systemReset();
+    RouteMidiSystemReset(FROM_DIN);
 }
 
 void setup_SerialMIDI() {
@@ -75,7 +90,5 @@ void setup_SerialMIDI() {
     MIDI.setHandleStop(dinHandleStop);
     MIDI.setHandleActiveSensing(dinHandleActiveSensing);
     MIDI.setHandleSystemReset(dinHandleSystemReset);
-
 }
-
 

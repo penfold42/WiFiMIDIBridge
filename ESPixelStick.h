@@ -24,6 +24,11 @@
 /* Name and version */
 const char VERSION[] = "0.1 (20170718)";
 
+#define FROM_INVALID 0
+#define FROM_WIFI 1
+#define FROM_DIN 2
+
+
 #define HTTP_PORT       80      /* Default web server port */
 #define MQTT_PORT       1883    /* Default MQTT port */
 #define DATA_PIN        2       /* Pixel output - GPIO2 */

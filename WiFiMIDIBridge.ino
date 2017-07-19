@@ -25,8 +25,6 @@ extern "C" {
 #include <SPI.h>
 #include "WiFiMIDIBridge.h"
 
-
-
 #include <RemoteDebug.h>
 RemoteDebug Debug;
 

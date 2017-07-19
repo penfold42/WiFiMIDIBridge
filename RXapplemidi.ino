@@ -33,42 +33,37 @@ void OnAppleMidiDisconnected(uint32_t ssrc) {
 //  SPI3(int cmd, int pitch, int velocity)
 
 void OnAppleMidiNoteOn(byte channel, byte note, byte velocity) {
-  MIDI.sendNoteOn(note,velocity,channel); 
-  SPI3(0x90+channel, note, velocity);
+  RouteMidiNoteOn(FROM_WIFI, channel,  note,  velocity);
 }
 void OnAppleMidiNoteOff(byte channel, byte note, byte velocity) {
-  MIDI.sendNoteOff(note,velocity,channel);
-  SPI3(0x80+channel, note, velocity);
+  RouteMidiNoteOff(FROM_WIFI,  channel,  note,  velocity);
 }
 void OnAppleMidiAfterTouchPoly(byte channel, byte note, byte pressure) {
-  MIDI.sendAfterTouch(note, pressure, channel);
-  SPI3(0xA0+channel, note, pressure);
+  RouteMidiAfterTouchPoly(FROM_WIFI,  channel,  note,  pressure);
 }
 void OnAppleMidiControlChange(byte channel, byte number, byte value) {
-  MIDI.sendControlChange(number, value, channel); 
-  SPI3(0xB0+channel, number, value);
+RouteMidiControlChange(FROM_WIFI,  channel,  number,  value);
 }
 void OnAppleMidiProgramChange(byte channel, byte number) {
-  MIDI.sendProgramChange(number, channel);
-  SPI2(0xC0+channel, number);
+RouteMidiProgramChange(FROM_WIFI,  channel,  number);
 }
 void OnAppleMidiAfterTouchChannel(byte channel, byte pressure) {
-  MIDI.sendAfterTouch(pressure, channel);
-  SPI2(0xD0+channel, pressure);
+RouteMidiAfterTouchChannel(FROM_WIFI,  channel,  pressure);
 }
-void OnAppleMidiPitchBend(byte channel, int bend) { MIDI.sendPitchBend(bend, channel); }
-void OnAppleMidiSystemExclusive(byte * array, byte size) { MIDI.sendSysEx(size, array, false); }
-void OnAppleMidiTimeCodeQuarterFrame(byte data) { MIDI.sendTimeCodeQuarterFrame(data); }
-void OnAppleMidiSongPosition(unsigned int beats) { MIDI.sendSongPosition(beats); }
-void OnAppleMidiSongSelect(byte songnumber) { MIDI.sendSongSelect(songnumber); }
-void OnAppleMidiTuneRequest(void) { MIDI.sendTuneRequest(); }
 
-void OnAppleMidiClock(void) { MIDI.sendRealTime(midi::Clock); }
-void OnAppleMidiStart(void) { MIDI.sendRealTime(midi::Start); }
-void OnAppleMidiContinue(void) { MIDI.sendRealTime(midi::Continue); }
-void OnAppleMidiStop(void) { MIDI.sendRealTime(midi::Stop); }
-void OnAppleMidiActiveSensing(void) {}
-void OnAppleMidiSystemReset(void) {}
+void OnAppleMidiPitchBend(byte channel, int bend) { RouteMidiPitchBend(FROM_WIFI,  channel,  bend); }
+void OnAppleMidiSystemExclusive(byte * array, byte size) {RouteMidiSystemExclusive(FROM_WIFI, array,  size); }
+void OnAppleMidiTimeCodeQuarterFrame(byte data) { RouteMidiTimeCodeQuarterFrame(FROM_WIFI,  data); }
+void OnAppleMidiSongPosition(unsigned int beats) { RouteMidiSongPosition(FROM_WIFI,  beats); }
+void OnAppleMidiSongSelect(byte songnumber) { RouteMidiSongSelect(FROM_WIFI,  songnumber); }
+void OnAppleMidiTuneRequest(void) { RouteMidiTuneRequest(FROM_WIFI); }
+
+void OnAppleMidiClock(void) { RouteMidiClock(FROM_WIFI); }
+void OnAppleMidiStart(void) { RouteMidiStart(FROM_WIFI); }
+void OnAppleMidiContinue(void) { RouteMidiContinue(FROM_WIFI); }
+void OnAppleMidiStop(void) { RouteMidiStop(FROM_WIFI); }
+void OnAppleMidiActiveSensing(void) {RouteMidiActiveSensing(FROM_WIFI);}
+void OnAppleMidiSystemReset(void) {RouteMidiSystemReset(FROM_WIFI);}
 
 
 void setup_AppleMIDI() {
