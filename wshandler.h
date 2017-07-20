@@ -40,6 +40,10 @@
 */
 
 EFUpdate efupdate;
+extern int counter_from_din;
+extern int counter_to_din;
+extern int counter_to_wifi;
+extern int counter_from_wifi;
 
 void procX(uint8_t *data, AsyncWebSocketClient *client) {
     switch (data[1]) {
@@ -50,10 +54,10 @@ void procX(uint8_t *data, AsyncWebSocketClient *client) {
             uint32_t seqErrors = 0;
             for (int i = 0; i < ((uniLast + 1) - config.universe); i++)
                 seqErrors =+ seqError[i];
-            client->text("X2" + (String)config.universe + ":" +
-                    (String)uniLast + ":" +
-                    (String)42 + ":" +
-                    (String)seqErrors + ":" +
+            client->text("X2" + (String)counter_from_wifi + ":" +
+                    (String)counter_to_wifi + ":" +
+                    (String)counter_from_din + ":" +
+                    (String)counter_to_din + ":" +
                     (String)69 + ":" +
                     "10.666.6.6" + ":" + 
                     (String)6699);
