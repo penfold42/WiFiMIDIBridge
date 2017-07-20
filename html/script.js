@@ -517,13 +517,11 @@ function getUptime(data) {
 function getE131Status(data) {
     var status = data.split(':');
    
-    $('#uni_first').text(status[0]);
-    $('#uni_last').text(status[1]);
-    $('#pkts').text(status[2]);
-    $('#serr').text(status[3]);
-    $('#perr').text(status[4]);
-    $('#clientip').text(status[5]);
-    $('#clientport').text(status[6]);
+    $('#counter_from_wifi').text(status[0]);
+    $('#counter_to_wifi').text(status[1]);
+    $('#counter_from_midi').text(status[2]);
+    $('#counter_to_midi').text(status[3]);
+
 }
 
 function snackSave() {

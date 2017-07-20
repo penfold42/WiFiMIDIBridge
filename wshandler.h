@@ -57,10 +57,7 @@ void procX(uint8_t *data, AsyncWebSocketClient *client) {
             client->text("X2" + (String)counter_from_wifi + ":" +
                     (String)counter_to_wifi + ":" +
                     (String)counter_from_din + ":" +
-                    (String)counter_to_din + ":" +
-                    (String)69 + ":" +
-                    "10.666.6.6" + ":" + 
-                    (String)6699);
+                    (String)counter_to_din + ":" ;
             break;
         }
         case 'h':
