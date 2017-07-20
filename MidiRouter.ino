@@ -2,6 +2,7 @@
 
 int counter_to_din;
 int counter_to_wifi;
+int counter_to_synth;
 
 void RouteMidiNoteOn(int note_from, byte channel, byte note, byte velocity) {
   if (note_from==FROM_DIN) {
@@ -12,7 +13,10 @@ void RouteMidiNoteOn(int note_from, byte channel, byte note, byte velocity) {
     counter_to_din++;
     MIDI.sendNoteOn(note,velocity,channel); 
   }
-  SPI3(0x90+channel, note, velocity);
+  if (1) {
+    counter_to_synth++;
+    SPI3(0x90+channel, note, velocity);
+  }
 }
 
 void RouteMidiNoteOff(int note_from, byte channel, byte note, byte velocity) {
@@ -24,7 +28,10 @@ void RouteMidiNoteOff(int note_from, byte channel, byte note, byte velocity) {
     counter_to_din++;
     MIDI.sendNoteOff(note,velocity,channel);
   }
-  SPI3(0x80+channel, note, velocity);
+  if (1) {
+    counter_to_synth++;
+    SPI3(0x80+channel, note, velocity);
+  }
 }
 
 void RouteMidiAfterTouchPoly(int note_from, byte channel, byte note, byte pressure) {
@@ -36,7 +43,10 @@ void RouteMidiAfterTouchPoly(int note_from, byte channel, byte note, byte pressu
     counter_to_din++;
     MIDI.sendAfterTouch(note, pressure, channel);
   }
-  SPI3(0xA0+channel, note, pressure);
+  if (1) {
+    counter_to_synth++;
+    SPI3(0xA0+channel, note, pressure);
+  }
 }
 
 void RouteMidiControlChange(int note_from, byte channel, byte number, byte value) {
@@ -48,7 +58,10 @@ void RouteMidiControlChange(int note_from, byte channel, byte number, byte value
     counter_to_din++;
     MIDI.sendControlChange(number, value, channel); 
   }
-  SPI3(0xB0+channel, number, value);
+  if (1) {
+    counter_to_synth++;
+    SPI3(0xB0+channel, number, value);
+  }
 }
 
 void RouteMidiProgramChange(int note_from, byte channel, byte number) {
@@ -60,7 +73,10 @@ void RouteMidiProgramChange(int note_from, byte channel, byte number) {
     counter_to_din++;
     MIDI.sendProgramChange(number, channel);
   }
-  SPI2(0xC0+channel, number);
+  if (1) {
+    counter_to_synth++;
+    SPI2(0xC0+channel, number);
+  }
 }
 
 void RouteMidiAfterTouchChannel(int note_from, byte channel, byte pressure) {
@@ -72,7 +88,10 @@ void RouteMidiAfterTouchChannel(int note_from, byte channel, byte pressure) {
     counter_to_din++;
     MIDI.sendAfterTouch(pressure, channel);
   }
-  SPI2(0xD0+channel, pressure);
+  if (1) {
+    counter_to_synth++;
+    SPI2(0xD0+channel, pressure);
+  }
 }
 
 void RouteMidiPitchBend(int note_from, byte channel, int bend) {
@@ -83,6 +102,10 @@ void RouteMidiPitchBend(int note_from, byte channel, int bend) {
   if (note_from==FROM_WIFI) {
     counter_to_din++;
     MIDI.sendPitchBend(bend, channel);
+  }
+  if (1) {
+    counter_to_synth++;
+    SPI3(0xE0+channel, bend&0x7f, (bend&0b11111110000000)>>7);
   }
 }
 
