@@ -44,6 +44,7 @@ extern int counter_from_din;
 extern int counter_to_din;
 extern int counter_to_wifi;
 extern int counter_from_wifi;
+extern int counter_to_synth;
 
 void procX(uint8_t *data, AsyncWebSocketClient *client) {
     switch (data[1]) {
@@ -57,7 +58,7 @@ void procX(uint8_t *data, AsyncWebSocketClient *client) {
             client->text("X2" + (String)counter_from_wifi + ":" +
                     (String)counter_to_wifi + ":" +
                     (String)counter_from_din + ":" +
-                    (String)counter_to_din + ":" );
+                    (String)counter_to_synth + ":" );
             break;
         }
         case 'h':
