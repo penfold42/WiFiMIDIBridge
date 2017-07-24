@@ -80,7 +80,6 @@ void procE(uint8_t *data, AsyncWebSocketClient *client) {
             DynamicJsonBuffer jsonBuffer;
             JsonObject &json = jsonBuffer.createObject();
 
-#if defined (ESPS_MODE_PIXEL)
             // Pixel Types
             JsonObject &p_type = json.createNestedObject("p_type");
             p_type["WS2811 800kHz"] = static_cast<uint8_t>(PixelType::WS2811);
@@ -95,21 +94,6 @@ void procE(uint8_t *data, AsyncWebSocketClient *client) {
             p_color["GBR"] = static_cast<uint8_t>(PixelColor::GBR);
             p_color["BGR"] = static_cast<uint8_t>(PixelColor::BGR);
 
-#elif defined (ESPS_MODE_SERIAL)
-            // Serial Protocols
-            JsonObject &s_proto = json.createNestedObject("s_proto");
-            s_proto["DMX512"] = static_cast<uint8_t>(SerialType::DMX512);
-            s_proto["Renard"] = static_cast<uint8_t>(SerialType::RENARD);
-
-            // Serial Baudrates
-            JsonObject &s_baud = json.createNestedObject("s_baud");
-            s_baud["38400"] = static_cast<uint32_t>(BaudRate::BR_38400);
-            s_baud["57600"] = static_cast<uint32_t>(BaudRate::BR_57600);
-            s_baud["115200"] = static_cast<uint32_t>(BaudRate::BR_115200);
-            s_baud["230400"] = static_cast<uint32_t>(BaudRate::BR_230400);
-            s_baud["250000"] = static_cast<uint32_t>(BaudRate::BR_250000);
-            s_baud["460800"] = static_cast<uint32_t>(BaudRate::BR_460800);
-#endif
 
             String response;
             json.printTo(response);
@@ -134,13 +118,12 @@ void procG(uint8_t *data, AsyncWebSocketClient *client) {
             json["ssid"] = (String)WiFi.SSID();
             json["hostname"] = (String)WiFi.hostname();
             json["ip"] = WiFi.localIP().toString();
-            json["mac"] = getMacAddress();
+            json["mac"] = WiFi.macAddress();
             json["version"] = (String)VERSION;
             json["flashchipid"] = String(ESP.getFlashChipId(), HEX);
             json["usedflashsize"] = (String)ESP.getFlashChipSize();
             json["realflashsize"] = (String)ESP.getFlashChipRealSize();
             json["freeheap"] = (String)ESP.getFreeHeap();
-            json["testing"] = static_cast<uint8_t>(config.testmode);
 
             String response;
             json.printTo(response);
@@ -172,70 +155,8 @@ void procS(uint8_t *data, AsyncWebSocketClient *client) {
     }
 }
 
-/*
-enum class TestMode : uint8_t {
-    DISABLED,
-    STATIC,
-    CHASE,
-    RAINBOW,
-    VIEW_STREAM
-};
-*/
 
 void procT(uint8_t *data, AsyncWebSocketClient *client) {
-    switch (data[1]) {
-        case '0':
-            config.testmode = TestMode::DISABLED;
-            // Clear whole string
-#if defined(ESPS_MODE_PIXEL)
-            for (int y =0; y < config.channel_count; y++)
-                pixels.setValue(y, 0);
-#elif defined(ESPS_MODE_SERIAL)
-            for (int y =0; y < config.channel_count; y++)
-                serial.setValue(y, 0);
-#endif
-            break;
-
-        case '1': {  // Static color
-            config.testmode = TestMode::STATIC;
-            testing.step = 0;
-            DynamicJsonBuffer jsonBuffer;
-            JsonObject &json = jsonBuffer.parseObject(reinterpret_cast<char*>(data + 2));
-
-            testing.r = json["r"];
-            testing.g = json["g"];
-            testing.b = json["b"];
-            break;
-        }
-        case '2': {  // Chase
-            config.testmode = TestMode::CHASE;
-            testing.step = 0;
-            DynamicJsonBuffer jsonBuffer;
-            JsonObject &json = jsonBuffer.parseObject(reinterpret_cast<char*>(data + 2));
-
-            testing.r = json["r"];
-            testing.g = json["g"];
-            testing.b = json["b"];
-            break;
-        }
-        case '3':  // Rainbow
-            config.testmode = TestMode::RAINBOW;
-            testing.step = 0;
-            break;
-
-        case '4': {  // View stream
-            config.testmode = TestMode::VIEW_STREAM;
-#if defined(ESPS_MODE_PIXEL)
-            client->binary(pixels.getData(), config.channel_count);
-#elif defined(ESPS_MODE_SERIAL)
-            if (config.serial_type == SerialType::DMX512)
-                client->binary(&serial.getData()[1], config.channel_count);
-            else
-                client->binary(&serial.getData()[2], config.channel_count);
-#endif
-            break;
-        }
-    }
 }
 
 void handle_fw_upload(AsyncWebServerRequest *request, String filename,

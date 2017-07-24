@@ -44,21 +44,6 @@ const char VERSION[] = "0.1 (20170718)";
 const char CONFIG_FILE[] = "/config.json";
 #define CONFIG_MAX_SIZE 2048    /* Sanity limit for config file */
 
-/* Pixel Types */
-enum class DevMode : uint8_t {
-    MPIXEL,
-    MSERIAL
-};
-
-/* Test Modes */
-enum class TestMode : uint8_t {
-    DISABLED,
-    STATIC,
-    CHASE,
-    RAINBOW,
-    VIEW_STREAM,
-    MQTT
-};
 
 typedef struct {
     uint8_t r,g,b;              //hold requested color
@@ -86,8 +71,8 @@ enum class PixelColor : uint8_t {
 typedef struct {
     /* Device */
     String      id;             /* Device ID */
-    DevMode     devmode;        /* Device Mode - used for reporting mode, can't be set */
-    TestMode    testmode;       /* Testing mode */
+//    DevMode     devmode;        /* Device Mode - used for reporting mode, can't be set */
+//    TestMode    testmode;       /* Testing mode */
 
     /* Network */
     String      ssid;
@@ -122,7 +107,7 @@ typedef struct {
 
 /* Globals */
 //E131Async       e131(10);       /* E131Async with X buffers */
-testing_t       testing;
+//testing_t       testing;
 config_t        config;
 uint32_t        *seqError;      /* Sequence error tracking for each universe */
 uint16_t        uniLast = 1;    /* Last Universe to listen for */

@@ -189,7 +189,6 @@ void ESP_setup() {
     // Load configuration from SPIFFS and set Hostname
     loadConfig();
     WiFi.hostname(config.hostname);
-    config.testmode = TestMode::DISABLED;
 
     // Setup WiFi Handlers
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
@@ -209,7 +208,7 @@ void ESP_setup() {
         if (config.ap_fallback) {
             DBG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, GOING SOFTAP ****"));
             WiFi.mode(WIFI_AP);
-            String ssid = "ESPixelStick " + String(config.hostname);
+            String ssid = "WiFiMIDIBridge " + String(config.hostname);
             WiFi.softAP(ssid.c_str());
         } else {
             DBG_PORT.println(F("**** FAILED TO ASSOCIATE WITH AP, REBOOTING ****"));
@@ -373,10 +372,6 @@ void validateConfig() {
         config.mqtt_topic = "diy/esps/" + String(chipId);
     }
 
-
-    // Set Mode
-    config.devmode = DevMode::MPIXEL;
-
     // Generic channel limits for pixels
     if (config.channel_count % 3)
         config.channel_count = (config.channel_count / 3) * 3;
@@ -521,7 +516,7 @@ void serializeConfig(String &jsonString, bool pretty, bool creds) {
     // Device
     JsonObject &device = json.createNestedObject("device");
     device["id"] = config.id.c_str();
-    device["mode"] = static_cast<uint8_t>(config.devmode);
+//    device["mode"] = static_cast<uint8_t>(config.devmode);
 
     // Network
     JsonObject &network = json.createNestedObject("network");
