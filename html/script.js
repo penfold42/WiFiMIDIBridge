@@ -521,6 +521,7 @@ function getE131Status(data) {
     $('#counter_to_wifi').text(status[1]);
     $('#counter_from_midi').text(status[2]);
     $('#counter_to_midi').text(status[3]);
+    $('#counter_to_synth').text(status[4]);
 
 }
 
